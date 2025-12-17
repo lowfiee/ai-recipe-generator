@@ -1,62 +1,86 @@
-import { useState, useEffect } from "react";
-import {
-  Button,
-  Heading,
-  View,
-  Card,
-  Divider,
-} from "@aws-amplify/ui-react";
+import { useState } from "react";
+import { Heading, View } from "@aws-amplify/ui-react";
 import { useAuthenticator } from "@aws-amplify/ui-react";
 import { generateClient } from "aws-amplify/data";
+import type { Schema } from "../amplify/data/resource";
 
-/**
- * @type {import('aws-amplify/data').Client}
- */
-const client = generateClient({
-  authMode: "userPool",
-});
+const client = generateClient<Schema>();
 
 export default function App() {
-  const [userProfiles, setUserProfiles] = useState([]);
-  // @ts-ignore
-  const { user, signOut } = useAuthenticator((context) => [context.user]);
+  const { signOut } = useAuthenticator();
+  const [ingredients, setIngredients] = useState("");
+  const [result, setResult] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    async function fetchProfiles() {
-      try {
-        // @ts-ignore
-        const result = await client.models.UserProfile.list();
-        setUserProfiles(result.data);
-      } catch (error) {
-        console.error("Error fetching user profiles:", error);
+  const handleGenerate = async () => {
+    setLoading(true);
+    setError("");
+    setResult("");
+
+    try {
+      const response = await client.queries.askBedrock({
+        ingredients: ingredients
+          .split(",")
+          .map((i) => i.trim())
+          .filter(Boolean),
+      });
+
+      if (response?.data?.body) {
+        setResult(response.data.body);
+      } else {
+        setError("No response from AI model.");
       }
+    } catch (err) {
+      console.error(err);
+      setError("Something went wrong generating the recipe.");
+    } finally {
+      setLoading(false);
     }
-
-    fetchProfiles();
-  }, []);
+  };
 
   return (
     <View className="app-container">
-      <Card className="bunny-card">
-        <Heading level={2}>🍒 Welcome, User</Heading>
-        <Divider />
+      <div className="cherry-card">
+        <Heading level={1}>🍒 Welcome, User</Heading>
 
-        <Button onClick={signOut}>Sign out</Button>
+        <button className="signout-btn" onClick={signOut}>
+          Sign out
+        </button>
 
-        <Divider />
-        <h3>🍒 User Profiles:</h3>
+        <hr style={{ margin: "2rem 0" }} />
 
-        {userProfiles.length > 0 ? (
-          <ul>
-            {userProfiles.map((profile, i) => (
-              // @ts-ignore
-              <li key={i}>{profile.name}</li>
-            ))}
-          </ul>
-        ) : (
-          <p>No profiles found yet!</p>
+        <Heading level={2}>🍒 Meet Your Personal Recipe AI</Heading>
+
+        <p>
+          Simply type a few ingredients using the format{" "}
+          <strong>ingredient1, ingredient2</strong>, etc., and Recipe AI
+          will generate an all-new recipe on demand.
+        </p>
+
+        <input
+          className="ai-input"
+          placeholder="chicken, white rice, garlic"
+          value={ingredients}
+          onChange={(e) => setIngredients(e.target.value)}
+        />
+
+        <button
+          className="generate-btn"
+          onClick={handleGenerate}
+          disabled={loading}
+        >
+          {loading ? "Generating..." : "Generate"}
+        </button>
+
+        {result && (
+          <div className="error-box" style={{ whiteSpace: "pre-wrap" }}>
+            {result}
+          </div>
         )}
-      </Card>
+
+        {error && <div className="error-box">{error}</div>}
+      </div>
     </View>
   );
 }

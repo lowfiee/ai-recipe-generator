@@ -10,6 +10,7 @@ body {
   background: linear-gradient(135deg, #f6e3e7, #fdf7f8);
 }
 
+/* center app */
 .app-container {
   min-height: 100vh;
   display: flex;
@@ -17,94 +18,137 @@ body {
   align-items: center;
 }
 
-/* main card */
-.bunny-card {
+/* MAIN CARD */
+.cherry-card {
   background-color: #ffffff;
-  border-radius: 18px;
+  border-radius: 20px;
   padding: 3rem;
   box-shadow: 0 20px 45px rgba(69, 15, 26, 0.25);
   text-align: center;
-  max-width: 480px;
+  max-width: 520px;
   width: 100%;
+  animation: cardFadeUp 0.9s ease-out forwards;
 }
 
-/* headings */
-.bunny-card h2,
-.bunny-card h3 {
+/* HEADINGS */
+.cherry-card h1,
+.cherry-card h2 {
   color: #450f1a;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.6rem;
 }
 
-/* body text */
-.bunny-card p {
+.cherry-card p {
   color: #6b2a35;
   margin: 0.75rem 0;
+  line-height: 1.5;
 }
 
-/* list */
-.bunny-card ul {
-  list-style: none;
-  padding: 0;
+/* INPUT */
+.ai-input {
+  width: 100%;
+  padding: 12px;
+  font-size: 1rem;
+  border-radius: 10px;
+  border: 1.8px solid #450f1a;
   margin-top: 1rem;
+  animation: fadeIn 0.8s ease-out 0.5s both;
 }
 
-.bunny-card li {
-  padding: 0.4rem 0;
-  font-weight: 500;
+/* BUTTONS */
+.generate-btn,
+.signout-btn {
+  background-color: #450f1a;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 0.7em 1.6em;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-top: 1.2rem;
+  cursor: pointer;
+  animation: fadeIn 0.8s ease-out 0.65s both;
+}
+
+.generate-btn:hover,
+.signout-btn:hover {
+  background-color: #2f0a11;
+  box-shadow: 0 8px 20px rgba(69, 15, 26, 0.35);
+  transform: translateY(-1px);
+  transition: all 0.25s ease;
+}
+
+/* ERROR BOX */
+.error-box {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border-radius: 12px;
+  background-color: #fff5f7;
   color: #450f1a;
+  animation: errorPop 0.4s ease-out;
 }
 
-.amplify-button {
-  background-color: #450f1a !important;
-  border-radius: 10px !important;
-  font-weight: 600 !important;
-}
-
-.amplify-button:hover {
-  background-color: #2f0a11 !important;
-}
-
-/* tabs */
-.amplify-tabs__item--active {
-  color: #450f1a !important;
-  border-color: #450f1a !important;
-}
-
-/* subtle entrance animation */
-[data-amplify-authenticator] {
-  animation: fadeIn 1s ease-in-out;
+/* ANIMATIONS */
+@keyframes cardFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(22px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(16px);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
+
+@keyframes errorPop {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* AUTHENTICATOR FADE */
 [data-amplify-authenticator] {
   min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
+  animation: fadeIn 0.8s ease-out;
+}
+
+/* AMPLIFY OVERRIDES (KEEP PRETTY) */
+.amplify-button {
+  background-color: #450f1a !important;
+  border-radius: 10px !important;
+}
+
+.amplify-button:hover {
+  background-color: #2f0a11 !important;
 }
 
 .amplify-button--link {
-  color: #ffffff !important;
-  font-weight: 500;
+  color: white !important;
 }
 
-.amplify-button--link:hover {
-  color: #f3d6dc !important;
+.amplify-tabs__item--active {
+  color: #450f1a !important;
+  border-color: #450f1a !important;
 }
 
 .amplify-field__show-password {
-  color: #ffffff !important;
-}
-
-.amplify-field__show-password:hover {
-  color: #f3d6dc !important;
+  color: white !important;
 }

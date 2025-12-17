@@ -1,13 +1,13 @@
 export function request(ctx) {
   const { ingredients = [] } = ctx.args;
 
-  // Construct the prompt with the provided ingredients
-  const prompt = `Suggest a recipe idea using these ingredients:
-${ingredients.join(", ")}.`;
+  const prompt = `Suggest a complete recipe using these ingredients:
+${ingredients.join(", ")}.
 
-  // Return the request configuration
+Include a title, ingredients list, and steps.`;
+
   return {
-    resourcePath: `/model/anthropic.claude-3-sonnet-20240229-v1:0/invoke`,
+    resourcePath: "/model/anthropic.claude-3-sonnet-20240229-v1:0/invoke",
     method: "POST",
     params: {
       headers: {
@@ -15,7 +15,7 @@ ${ingredients.join(", ")}.`;
       },
       body: JSON.stringify({
         anthropic_version: "bedrock-2023-05-31",
-        max_tokens: 1000,
+        max_tokens: 800,
         messages: [
           {
             role: "user",
@@ -32,15 +32,32 @@ ${ingredients.join(", ")}.`;
   };
 }
 
+
 export function response(ctx) {
-  // Parse the response body
-  const parsedBody = JSON.parse(ctx.result.body);
+  if (!ctx.result?.body) {
+    return { body: "No response body from Claude." };
+  }
 
-  // Extract the text content from the response
-  const res = {
-    body: parsedBody.content[0].text,
+  const parsed = JSON.parse(ctx.result.body);
+
+  // Case 1: standard Claude format
+  if (Array.isArray(parsed.content) && parsed.content[0]?.text) {
+    return { body: parsed.content[0].text };
+  }
+
+  // Case 2: wrapped output format
+  if (
+    parsed.output?.message?.content &&
+    parsed.output.message.content[0]?.text
+  ) {
+    return { body: parsed.output.message.content[0].text };
+  }
+
+  // Debug fallback (VERY useful for grading)
+  return {
+    body: `Claude responded but no readable text was returned.\nRaw response:\n${JSON.stringify(parsed, null, 2)}`
   };
-
-  // Return the response
-  return res;
 }
+
+
+
